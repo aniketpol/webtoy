@@ -1,0 +1,155 @@
+<!Doctype HTML>
+
+<!-- 
+    Created By:
+	Aniket Pol.
+	
+	Date:9/9/13
+  
+    This html page contains code to access WebCam 
+    using navigator.getuserMedia() method in WebRTC.
+ 
+    Refer to the "https://developer.mozilla.org/en-US/docs/Web/API/Navigator.getUserMedia
+    for more detail
+-->
+<head>
+<title>Sup!!!</title>
+
+
+<style type="text/css">
+
+
+#container{
+overflow: hidden;
+background-color:lightgrey;
+border:1px solid black;
+}
+
+#VideoContainer{
+width:500px;
+height:400px;
+margin:0px 0px 50px 40px;
+-moz-transform: scale(-1, 1);
+-webkit-transform: scale(-1, 1);
+-o-transform: scale(-1, 1);
+transform: scale(-1, 1);
+filter: FlipH;
+}
+
+#CanvasContainer{
+display:none;
+}
+
+
+#takeSnapshot{
+width:200px;
+height:60px;
+font-size:20px;
+}
+
+#ImageContainer{
+margin:0px 0px 60px 0px;
+width:500px;
+height:380px;
+border:1px solid black;
+}
+
+.grayscale {
+  +filter: grayscale(1);
+}
+.sepia {
+  +filter: sepia(1);
+}
+.blur {
+  +filter: blur(3px);
+}
+
+</style>
+</head>
+
+<body>
+<div id="container">
+<center><h1>WebToy!!!</h1></center>
+<video autoplay id="VideoContainer"></video>
+<button id="takeSnapshot">Take Snap</button>
+<canvas id="CanvasContainer"></canvas>
+<img id="ImageContainer"> 
+<footer>&copyAniket Pol</footer>
+</div>
+
+<script>
+
+(function(){
+     var video = document.querySelector('#VideoContainer'); 
+      var canvas = document.querySelector('#CanvasContainer');
+	  var image = document.querySelector('#ImageContainer');
+	  var takeSnapshot = document.querySelector('#takeSnapshot');
+	 var ctx= canvas.getContext('2d');
+	 width=100;
+	 height=100;
+	 var flag = false;
+
+	
+navigator.getMedia = ( navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia);
+
+navigator.getMedia (
+
+   // constraints
+   {
+      video: true,
+      audio: false
+   },
+
+   // successCallback
+   function(localMediaStream) {
+      flag=true;
+      video.src = window.URL.createObjectURL(localMediaStream);
+      video.onloadedmetadata = function(e) {
+         // Do something with the video here.
+      };
+   },
+
+   // errorCallback
+   function(err) {
+    console.log("The following error occured: " + err);
+   }
+
+);
+
+      var idx = 0;
+     var filters = ['grayscale', 'sepia', 'blur'];
+
+function changeFilter(e) {
+  var el = e.target;  var effect = 'sepia'; // loop through filters.
+ 
+    el.classList.add(effect);
+
+}
+
+     document.querySelector('video').addEventListener('click', changeFilter, false);
+	
+	function snapshot() {
+
+  if (flag) {
+     canvas.width = width;
+    canvas.height = height;
+	ctx.translate(width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0,width,height);
+    // "image/webp" works in Chrome 18. In other browsers, this will fall back to image/png.
+   image.src = canvas.toDataURL('image/png');
+  }
+}
+
+    function show(ev){
+  	snapshot();
+    ev.preventDefault(); 
+	}
+ takeSnapshot.addEventListener('click',show , false);
+
+})();
+</script>
+</body>
